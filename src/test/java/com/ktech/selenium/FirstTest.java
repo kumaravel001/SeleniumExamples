@@ -129,7 +129,7 @@ public class FirstTest {
         File scrnFile = screenshot.getScreenshotAs(OutputType.FILE);
         Instant dateTime = Instant.now();
         String date = dateTime.toString().substring(0,10);
-        FileUtils.copyFile(scrnFile,new File("src/test/resources/ScreenShots/"+date+"/"+dateTime));
+        FileUtils.copyFile(scrnFile,new File("src/test/resources/ScreenShots/"+date+"/"+dateTime+".png"));
 
 
 
