@@ -1,16 +1,23 @@
 package com.ktech.selenium;
 
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.lang.model.element.Element;
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -93,7 +100,7 @@ public class FirstTest {
     }
 
     @Test
-    public void standardSeleniumFunctionalities() throws InterruptedException {
+    public void standardSeleniumFunctionalities() throws InterruptedException, IOException {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
@@ -109,6 +116,20 @@ public class FirstTest {
 
         WebElement element = driver.findElement(By.xpath("//img[@src='//upload.wikimedia.org/wikipedia/commons/thumb/3/32/Googleplex_HQ_%28cropped%29.jpg/250px-Googleplex_HQ_%28cropped%29.jpg']"));
         js.executeScript("arguments[0].scrollIntoView(true);", element);
+
+        //Actions Class
+
+        Actions actions = new Actions(driver);
+        Action action = actions.clickAndHold().contextClick().doubleClick().moveToElement(element).moveByOffset(1,1).keyDown(Keys.CONTROL).keyUp(Keys.CONTROL).sendKeys(element,Keys.TAB).build();
+        action.perform();
+
+        //Taking Screenshot
+
+        TakesScreenshot screenshot = (TakesScreenshot) driver;
+        File scrnFile = screenshot.getScreenshotAs(OutputType.FILE);
+        Instant dateTime = Instant.now();
+        String date = dateTime.toString().substring(0,10);
+        FileUtils.copyFile(scrnFile,new File("src/test/resources/ScreenShots/"+date+"/"+dateTime));
 
 
 
