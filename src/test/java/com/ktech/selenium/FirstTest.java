@@ -19,13 +19,15 @@ public class FirstTest {
     private static final String SUBMIT_BTN = "//button[@type='submit']";
     private static final String SEARCH_URL = "https://en.wikipedia.org/wiki/Google";
 
+    static WebDriver driver;
 
-    @Test
-    public void seleniumMethods() {
+
+   // @Test
+    public void seleniumMethods() throws InterruptedException {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
         System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
-        WebDriver driver = new ChromeDriver(options); // instantiating ChromeDriver.
+        driver = new ChromeDriver(options); // instantiating ChromeDriver.
 
         //get methods in Selenium.
         driver.get("https://www.wikipedia.org/"); // opens Wikipedia home page.
@@ -35,14 +37,15 @@ public class FirstTest {
         System.out.println(driver.getTitle().equals("WIKIPEDIA")); // gets Page Title
         System.out.println(driver.getPageSource()); // gets the page source.
 
+
         //navigate methods in Selenium.
-        driver.navigate().to("https://www.wikipedia.org/");
+        //driver.navigate().to("https://www.wikipedia.org/");
         driver.navigate().back();
-        driver.navigate().forward();
+        driver.navigate().forward(); // moving forward to the previous page to continue actions.
         driver.navigate().refresh();
 
         //find methods in Selenium.
-
+        Thread.sleep(Duration.ofSeconds(3));
         System.out.println("Page Title : " + driver.findElement(By.xpath("//*[contains(@class,'-title-main')]")).getText());
         List<WebElement> textAppearance = driver.findElements(By.xpath("//div[@id='skin-client-prefs-vector-feature-custom-font-size']//child::div[@class='cdx-radio']"));
         for (WebElement element : textAppearance) {
@@ -85,6 +88,30 @@ public class FirstTest {
         FluentWait wait1 = new FluentWait<WebDriver>(driver);
         wait1.withTimeout(Duration.ofSeconds(10)).pollingEvery(Duration.ofSeconds(1)).ignoring(NoSuchElementException.class);
         wait1.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//img[@src='//upload.wikimedia.org/wikipedia/commons/thumb/3/32/Googleplex_HQ_%28cropped%29.jpg/250px-Googleplex_HQ_%28cropped%29.jpg']")));
+
+
+    }
+
+    @Test
+    public void standardSeleniumFunctionalities() throws InterruptedException {
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--remote-allow-origins=*");
+        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
+        driver = new ChromeDriver(options); // instantiating ChromeDriver.
+        driver.get("https://en.wikipedia.org/wiki/Google");
+        Thread.sleep(3000);
+        driver.manage().window().maximize();
+        //scrolling using JavaScript Executor.
+
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+
+        WebElement element = driver.findElement(By.xpath("//img[@src='//upload.wikimedia.org/wikipedia/commons/thumb/3/32/Googleplex_HQ_%28cropped%29.jpg/250px-Googleplex_HQ_%28cropped%29.jpg']"));
+        js.executeScript("arguments[0].scrollIntoView(true);", element);
+
+
+
     }
 
 
