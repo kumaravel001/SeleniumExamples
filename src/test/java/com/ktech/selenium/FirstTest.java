@@ -2,6 +2,10 @@ package com.ktech.selenium;
 
 
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 import org.junit.Assert;
 import org.openqa.selenium.*;
@@ -15,6 +19,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import javax.lang.model.element.Element;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -130,6 +136,40 @@ public class FirstTest {
         Instant dateTime = Instant.now();
         String date = dateTime.toString().substring(0,10);
         FileUtils.copyFile(scrnFile,new File("src/test/resources/ScreenShots/"+date+"/"+dateTime+".png"));
+
+       //Reading and Writing Excel
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/TestData_PB.xlsx");
+        Workbook workbook = new XSSFWorkbook(fileInputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        int rowCount = sheet.getLastRowNum();
+        for(int i =0; i <rowCount; i++)
+        {
+            Row row = sheet.getRow(i);
+            int colCount = row.getLastCellNum();
+            for(int j=0; j<colCount;j++)
+            {
+                String data = row.getCell(i).getStringCellValue();
+            }
+        }
+
+        // Writing an Excel
+
+        FileInputStream fileInputStream1 = new FileInputStream("src/test/resources/TestData_PB.xlsx");
+        Workbook workbook1 = new XSSFWorkbook(fileInputStream1);
+        workbook1.createSheet("TestData");
+        Sheet sheet1 = workbook1.getSheet("TestData");
+        for(int i=0;i<5;i++)
+        {
+            sheet1.createRow(i);
+            Row row = sheet1.getRow(i);
+            for(int j =0; j<5;j++)
+            {
+                row.createCell(j).setCellValue("test");
+            }
+        }
+
+        FileOutputStream fileOutputStream = new FileOutputStream("src/test/resources/TestData_PB.xlsx");
+        workbook1.write(fileOutputStream);
 
 
 
