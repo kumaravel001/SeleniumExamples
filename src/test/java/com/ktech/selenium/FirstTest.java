@@ -6,26 +6,33 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Test;
-import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import javax.lang.model.element.Element;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import static java.nio.file.Files.readAllBytes;
 
 public class FirstTest {
     private static final String SEARCH_BOX = "//input[@name ='search']";
@@ -37,8 +44,12 @@ public class FirstTest {
 
    // @Test
     public void seleniumMethods() throws InterruptedException {
+        HashMap<String, String> prefs = new HashMap<>();
+        prefs.put("download.default_directory","c://");
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-notifications");
         options.addArguments("--remote-allow-origins=*");
+        options.setExperimentalOption("prefs",prefs);
         System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
         driver = new ChromeDriver(options); // instantiating ChromeDriver.
 
@@ -50,7 +61,6 @@ public class FirstTest {
         System.out.println(driver.getTitle().equals("WIKIPEDIA")); // gets Page Title
         System.out.println(driver.getPageSource()); // gets the page source.
 
-
         //navigate methods in Selenium.
         //driver.navigate().to("https://www.wikipedia.org/");
         driver.navigate().back();
@@ -58,7 +68,7 @@ public class FirstTest {
         driver.navigate().refresh();
 
         //find methods in Selenium.
-        Thread.sleep(Duration.ofSeconds(3));
+        //Thread.sleep(Duration.ofSeconds(3));
         System.out.println("Page Title : " + driver.findElement(By.xpath("//*[contains(@class,'-title-main')]")).getText());
         List<WebElement> textAppearance = driver.findElements(By.xpath("//div[@id='skin-client-prefs-vector-feature-custom-font-size']//child::div[@class='cdx-radio']"));
         for (WebElement element : textAppearance) {
@@ -70,7 +80,12 @@ public class FirstTest {
         //Switch methods usage
         try {
             driver.switchTo().alert();// there is no alert in wikipedia page so this is expected to fail.
+            driver.switchTo().alert().accept();
+            driver.switchTo().alert().dismiss();
+            driver.switchTo().alert().sendKeys("test");
+            driver.switchTo().alert().getText();
             driver.switchTo().frame(1); // there is no frame in wikipedia.
+            driver.switchTo().defaultContent();
             String currentWindow = driver.getWindowHandle();
             Set<String> windows = driver.getWindowHandles(); // there is only one window in wikipedia, so driver won't switch
             for (String window : windows) {
@@ -92,8 +107,11 @@ public class FirstTest {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // driver waits throughout execution for 10 seconds.
         driver.navigate().refresh();
         //Explicit Wait
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)); //driver will wait 10seconds before timeout.
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//img[@src='//upload.wikimedia.org/wikipedia/commons/thumb/3/32/Googleplex_HQ_%28cropped%29.jpg/250px-Googleplex_HQ_%28cropped%29.jpg']")));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(SUBMIT_BTN)));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(SUBMIT_BTN)));
+        //driver will wait 10seconds before timeout.
+        //wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//img[@src='//upload.wikimedia.org/wikipedia/commons/thumb/3/32/Googleplex_HQ_%28cropped%29.jpg/250px-Googleplex_HQ_%28cropped%29.jpg']")));
         //Explicit Wait will wait until given condition becomes true or throws exception if element is not visible within given timeout.
 
         //FluentWait - We can configure polling period and ignor the exceptions
@@ -105,11 +123,15 @@ public class FirstTest {
 
     }
 
-    @Test
+   // @Test
     public void standardSeleniumFunctionalities() throws InterruptedException, IOException {
 
         ChromeOptions options = new ChromeOptions();
+        HashMap<String, String> prefs = new HashMap<>();
+        prefs.put("download.default_directory", "src/test/resources");
+        options.setExperimentalOption("prefs",prefs);
         options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--disable-notifications");
         System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
         driver = new ChromeDriver(options); // instantiating ChromeDriver.
         driver.get("https://en.wikipedia.org/wiki/Google");
@@ -122,6 +144,11 @@ public class FirstTest {
 
         WebElement element = driver.findElement(By.xpath("//img[@src='//upload.wikimedia.org/wikipedia/commons/thumb/3/32/Googleplex_HQ_%28cropped%29.jpg/250px-Googleplex_HQ_%28cropped%29.jpg']"));
         js.executeScript("arguments[0].scrollIntoView(true);", element);
+
+        Select drp = new Select(driver.findElement(By.xpath(SUBMIT_BTN)));
+        drp.selectByIndex(0);
+
+
 
         //Actions Class
 
@@ -149,6 +176,7 @@ public class FirstTest {
             for(int j=0; j<colCount;j++)
             {
                 String data = row.getCell(i).getStringCellValue();
+
             }
         }
 
@@ -170,8 +198,6 @@ public class FirstTest {
 
         FileOutputStream fileOutputStream = new FileOutputStream("src/test/resources/TestData_PB.xlsx");
         workbook1.write(fileOutputStream);
-
-
 
     }
 
